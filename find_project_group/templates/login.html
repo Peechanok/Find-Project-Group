@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container">
+        <h1>Login to Event</h1>
+        <br/><br/>
+        {% if error %}
+        <p class ="text-danger">{{error}}</p>
+       {% endif %}
+        <form method="POST" action="{% url 'find_ptoject_login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control ml-3" id="username" 
+                    name="username" value="{{username}}">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control ml-3" id="password" 
+                    name="password" value="{{password}}">
+            </div>
+            <button type="submit" class="btn btn-primary ml-3">Login</button>
+        </form>
+        <br/><br/>
+    </div>
+{% endblock %}

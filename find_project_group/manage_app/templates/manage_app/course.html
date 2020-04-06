@@ -1,0 +1,46 @@
+{% extends 'base.html' %} {% block content %} {% load static %}
+
+<style>
+
+</style>
+<div class="container">
+    <form class="form-inline" method="GET" action="{% url 'find_project_couse' %}">
+        <div class="container">
+
+            <table class="table">
+                <tbody>
+                    {% for item in coursall %}
+                    <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br>
+                        <form>
+
+                            <button type="submit" class="btn btn-warning ml-3">Open</button>
+                        </form>
+                    </td>
+                    </br> {% endfor %}
+
+                </tbody>
+            </table>
+    </form>
+    </div>
+    </br>
+    </br>
+ 
+    <div class="footer">
+       {%if perms.manage_app.add_course%}
+        <form action="{% url 'add_course' %}">
+
+            <button type="submit" class="btn btn-warning ml-3">Create Group</button>
+        </form></div>
+{% endif %}
+  {%if perms.manage_app.delete_course%}
+        <form action="{% url 'view_course' %}">
+
+            <button type="submit" class="btn btn-warning ml-3">Delete Group</button>
+        </form>{% endif %}
+        
+    </div>
+</div>
+
+
+</div>
+{% endblock %}

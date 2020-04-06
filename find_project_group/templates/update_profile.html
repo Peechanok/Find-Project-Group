@@ -9,41 +9,47 @@
 
             <!-- Submit to user_add view -->
             {% if user.id %}
-            <form method="POST" action="{% url 'find_ptoject_user_update' user_id=user.id %}">
+            <form method="POST" action="{% url 'find_project_user_update' user_id=user.id %}">
 
                 {% else %}
                 <!-- Submit to student_add view -->
-                <form method="POST" action="{% url 'find_ptoject_user_profile' %}">
+                <form method="POST" action="{% url 'find_project_user_profile' %}">
                     {% endif %} {% csrf_token %} {% if msge %}
                     <p class="text-success">{{msge}}</p>{% endif %}
                     <div class="form-row">
 
                         <div class="form-group col-6">
-                            <label for="section">username:</label>
+                            <label for="section">Username:</label>
                             <input type="text" class="form-control" name="username" id="username" value="{{user.username}}" required>
                         </div>
 
                         <div class="form-group col-6">
-                            <label for="section">ชื่อจริง:</label>
+                            <label for="section">Firstname:</label>
                             <input type="text" class="form-control" name="first_name" id="first_name" value="{{user.first_name}}" required>
                         </div>
                         <div class="form-group col-6">
-                            <label for="section">นามสกุล:</label>
+                            <label for="section">Lastname:</label>
                             <input type="text" class="form-control" name="last_name" id="last_name" value="{{user.last_name}}" required>
                         </div>
 
                         <div class="form-group col-6">
-                            <label for="section">email:</label>
-                            <input type="text" class="form-control" name="email" id="email" value="{{user.email}}" required>
+                            <label for="section">Year:</label>
+                            <input type="text" class="form-control" name="year" id="year" value="{{user.student.year}}" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="section">Major:</label>
+                            <input type="text" class="form-control" name="major" id="year" value="{{user.student.major}}" required>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="section">Contect:</label>
+                            <input type="text" class="form-control" name="contect" id="year" value="{{user.student.contect}}" required>
                         </div>
                     </div>
                     <button type="reset" class="btn btn-warning ml-3">Reset Form</button>
                     <button type="submit" class="btn btn-primary ml-3">Update</button>
                 </form>
         </div>
-        <div class="col-sm-6" style="background-color:pink;">
-            <p>Ticket You use to Buy</p>
-        </div>
+
     </div>
 </div>
 

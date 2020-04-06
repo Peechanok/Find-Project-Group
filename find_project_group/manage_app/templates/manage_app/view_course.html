@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container">
+        
+        <br/><br/>
+        <form class="form-inline" method="GET" action="{% url 'view_course' %}">
+ 
+        <br/><br/>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name </th>
+                    <th scope="col">Description </th>
+                    <th scope="col">ลบ</th>
+                </tr>
+            </thead>
+            <tbody>
+               {% for item in course %}
+                <tr>
+                    <!--<td>{{ cl.Ev }}</td>-->
+              
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.desc }}</td>
+                     <td> <a href="{% url 'delete_course' course_id=item.id %}">
+                            <div class="btn btn-warning" id="{{item.id}}">ลบ</div>
+                  
+                        </a>
+                        
+                    </td>
+                   
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+        </form>
+    </div>
+{% endblock  %}

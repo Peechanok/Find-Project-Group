@@ -8,27 +8,23 @@ from urllib import request
 from webbrowser import get
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,permission_required
 from django.contrib.auth.models import Group, User
 from django.db import IntegrityError
 from django.forms import models
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls.base import is_valid_path
 
 from manage_app.models import Student
 
-
 # Create your views here.
 
-
+@login_required
 def home(request):
-    
-    query_results = Student.objects.all()
-    
         
-    return render(request, 'manage_app/home.html',context={
-        'query_results': query_results,
-        })
+    return render(request, 'home.html',)
+
 
 
 
@@ -37,9 +33,10 @@ def my_login(request):
     context = {}
 
     if request.method == 'POST':
+       
         username = request.POST.get('username')
         password = request.POST.get('password')
-
+               
         user = authenticate(request, username=username, password=password)
 
         if user:
@@ -49,7 +46,7 @@ def my_login(request):
             if next_url:
                 return redirect(next_url)
             else:
-                return redirect('find_ptoject_home')
+                return redirect('find_project_home')
         else:
             context['username'] = username
             context['password'] = password
@@ -58,51 +55,50 @@ def my_login(request):
     next_url = request.GET.get('next')
     if next_url:
         context['next_url'] = next_url
+        
 
-    return render(request, template_name='login.html', context=context)
+    return render(request, template_name='Loginindex.html', context=context)
 
 @login_required
 
 def my_logout(request):
     logout(request)
-    return redirect('find_ptoject_login')
+    return redirect('find_project_login')
 
 def sign_in(request):
     """
         เพิ่มข้อมูล user / student ใหม่เข้าสู่ฐานข้อมูล
     """
-    msge = ''
-    context = {}
-  
+    msg = ''
+
     if request.method == 'POST':
-        
-           
         user = User.objects.create_user(
             request.POST.get('username'),
             request.POST.get('email'),
             request.POST.get('password'),
             
-           
         )
+       
         user.first_name = request.POST.get('first_name')
         user.last_name = request.POST.get('last_name')
-        group = Group.objects.get(name='registered')
-        user.groups.add(group)
-            
-
+        student = Student.objects.create(
+            user=user,
+            year=request.POST.get('year'),
+            major=request.POST.get('major'),
+            contect=request.POST.get('contect')
+        )
         user.save()
-        redirect('find_ptoject_login')   
-        msge = 'Successfully create new Account - username: %s' % (user.username)
-         
+        msge = 'Successfully create new student - username: %s' % (user.username)
     else:
         user = User.objects.none()
-        
+
     context = {
-        
+        'student': user,
         'msge': msge
     }
 
-    return render(request, 'sign_in.html', context=context)
+    return render(request, 'Loginindex.html', context=context)
+
 
 @login_required
 def change_password(request):
@@ -155,9 +151,48 @@ def update_profile(request,user_id):
     }
 
     return render(request, template_name='manage_app/home.html', context=context)
-    
+
+
 @login_required
-def profile(request):
+def update_profile(request,user_id):
+    """
+        Update ข้อมูลนักเรียนที่มี id = user_id
+    """
+    
+    try:
+        user = User.objects.get(pk=user_id)
+        msg = ''
+    except User.DoesNotExist:
+        return redirect('find_project_home')
+
+    if request.method == 'POST':
+        user.username=request.POST.get('username')
+        user.first_name=request.POST.get('first_name')
+        user.last_name=request.POST.get('last_name')
+        try:
+            user.student.year=request.POST.get('year')
+            user.student.major=request.POST.get('major')
+            user.student.contect=request.POST.get('contect')
+        except Student.DoesNotExist:
+            student = Student.objects.create(
+            user=user,
+            year=request.POST.get('year'),
+            major=request.POST.get('major'),
+            contect=request.POST.get('contect')
+        )
+        user.save()
+        msg = 'Successfully update student - username: %s' % (user.username)
+    
+    context = {
+        'student': user,
+        'msg': msg
+    }
+
+    return render(request, 'update_profile.html', context=context)
+    
+@login_required   
+@permission_required('manage_app.view_student')
+def profile_user(request):
         
 
     return render(request, 'update_profile.html')

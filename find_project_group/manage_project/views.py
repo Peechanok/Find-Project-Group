@@ -8,7 +8,7 @@ from urllib import request
 from webbrowser import get
 
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required,permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import Group, User
 from django.db import IntegrityError
 from django.forms import models
@@ -16,7 +16,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls.base import is_valid_path
 
-from manage_app.models import Student
+from manage_app.models import Student,Project_experience
 
 # Create your views here.
 
@@ -161,7 +161,7 @@ def update_profile(request,user_id):
     
     try:
         user = User.objects.get(pk=user_id)
-        msg = ''
+        msge = ''
     except User.DoesNotExist:
         return redirect('find_project_home')
 
@@ -181,18 +181,48 @@ def update_profile(request,user_id):
             contect=request.POST.get('contect')
         )
         user.save()
-        msg = 'Successfully update student - username: %s' % (user.username)
+      #  project_ex = Project_experience.objects.create(
+           
+            
+           # Project_topic=request.POST.get('Project_topic'),
+           # desc=request.POST.get('desc')
+      #  )
+      #  project_ex.name.add(user_request.get("user"))
+      #  project_ex.save()
+        msge = 'Successfully update student - username: %s' % (user.username)
     
     context = {
         'student': user,
-        'msg': msg
+        'msge': msge,
+      #  'project_ex' : project_ex
     }
 
     return render(request, 'update_profile.html', context=context)
-    
-@login_required   
-@permission_required('manage_app.view_student')
-def profile_user(request):
-        
 
-    return render(request, 'update_profile.html')
+
+
+def view_update_profile(request,user_id):
+    user = User.objects.get(pk=user_id)
+    
+    student = Student.objects.all()
+    project_ex = Project_experience.objects.all()
+    context = {
+        'student': student,
+        'user': user,
+        'project_ex':project_ex
+    }
+    return render(request, 'update_profile.html',context=context)
+
+@login_required   
+
+def profile_user(request,user_id):
+    user = User.objects.get(pk=user_id)
+    
+    student = Student.objects.all()
+    project_ex = Project_experience.objects.all()
+    context = {
+        'student': student,
+        'user': user,
+        'project_ex':project_ex
+    }
+    return render(request, 'profile.html',context=context)

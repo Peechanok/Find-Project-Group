@@ -1,46 +1,195 @@
 {% extends 'base.html' %} {% block content %} {% load static %}
 
 <style>
-
+    body {
+        background: -webkit-linear-gradient(left, #D96767, #214785, #EAC9B8);
+    }
+    
+    .emp-profile {
+        padding: 3%;
+        margin-top: 3%;
+        margin-bottom: 3%;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+    
+    .profile-img {
+        text-align: center;
+    }
+    
+    .profile-img img {
+        width: 70%;
+        height: 100%;
+    }
+    
+    .profile-img .file {
+        position: relative;
+        overflow: hidden;
+        margin-top: -20%;
+        width: 70%;
+        border: none;
+        border-radius: 0;
+        font-size: 15px;
+        background: #212529b8;
+    }
+    
+    .profile-img .file input {
+        position: absolute;
+        opacity: 0;
+        right: 0;
+        top: 0;
+    }
+    
+    .profile-head h5 {
+        color: #333;
+    }
+    
+    .profile-head h6 {
+        color: #0062cc;
+    }
+    
+    .profile-edit-btn {
+        border: none;
+        border-radius: 1.5rem;
+        width: 70%;
+        padding: 2%;
+        font-weight: 600;
+        color: #6c757d;
+        cursor: pointer;
+    }
+    
+    .proile-rating {
+        font-size: 12px;
+        color: #818182;
+        margin-top: 5%;
+    }
+    
+    .proile-rating span {
+        color: #495057;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .profile-head .nav-tabs {
+        margin-bottom: 5%;
+    }
+    
+    .profile-head .nav-tabs .nav-link {
+        font-weight: 600;
+        border: none;
+    }
+    
+    .profile-head .nav-tabs .nav-link.active {
+        border: none;
+        border-bottom: 2px solid #0062cc;
+    }
+    
+    .profile-work {
+        padding: 14%;
+        margin-top: -15%;
+    }
+    
+    .profile-work p {
+        font-size: 12px;
+        color: #818182;
+        font-weight: 600;
+        margin-top: 10%;
+    }
+    
+    .profile-work a {
+        text-decoration: none;
+        color: #495057;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .profile-work ul {
+        list-style: none;
+    }
+    
+    .profile-tab label {
+        font-weight: 600;
+    }
+    
+    .profile-tab p {
+        font-weight: 600;
+        color: #0062cc;
+    }
 </style>
-<div class="container">
+<div class="container emp-profile">
     <form class="form-inline" method="GET" action="{% url 'find_project_couse' %}">
-        <div class="container">
-
-            <table class="table">
+        <div class="row">
+           
+            <div class="col-md">
+                  <table class="table">
                 <tbody>
                     {% for item in coursall %}
-                    <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br>
+                    <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br></br></br>
                         <form>
 
-                            <button type="submit" class="btn btn-warning ml-3">Open</button>
+                            <button type="submit" class="btn btn-info ml-3">Open</button>
                         </form>
                     </td>
                     </br> {% endfor %}
 
                 </tbody>
             </table>
-    </form>
-    </div>
-    </br>
-    </br>
- 
-    <div class="footer">
-       {%if perms.manage_app.add_course%}
+
+    </form></br></br>
+    <div class="row">
+     <div class="col-md-2"> {%if perms.manage_app.add_course%}
         <form action="{% url 'add_course' %}">
 
             <button type="submit" class="btn btn-warning ml-3">Create Group</button>
-        </form></div>
-{% endif %}
-  {%if perms.manage_app.delete_course%}
+        </form>
+{% endif %}</div>
+     <div class="col-md-10"> {%if perms.manage_app.delete_course%}
         <form action="{% url 'view_course' %}">
 
-            <button type="submit" class="btn btn-warning ml-3">Delete Group</button>
-        </form>{% endif %}
-        
+            <button type="submit" class="btn btn-danger ml-3">Delete Group</button>
+        </form>{% endif %}</div>
     </div>
+    
+ 
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+
+
+            </div>
+            <div class="col-md-8">
+ 
+            </div>
+
+
+        </div>
+    </form>
+
 </div>
 
 
-</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {% endblock %}

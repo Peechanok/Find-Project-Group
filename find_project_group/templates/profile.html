@@ -120,47 +120,46 @@
     }
 </style>
 <div class="container emp-profile">
-    {% if user.id %}
-    <form method="POST" action="{% url 'find_project_user_update' user_id=user.id %}">
-
-        {% else %}
-        <!-- Submit to student_add view -->
-        <form method="POST" action="{% url 'find_project_user_profile' %}">
-            {% endif %} {% csrf_token %}
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="profile-img">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt="" />
-                        <div class="file btn btn-lg btn-primary">
-                            Change Photo
-                            <input type="file" name="file" />
-                        </div>
+    <form method="GET" action="{% url 'find_project_user_profile' user_id=user.id %}">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="profile-img">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt="" />
+                    <div class="file btn btn-lg btn-primary">
+                        Change Photo
+                        <input type="file" name="file" />
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="profile-head">
-                        {% if msge %}
-                        <p class="text-success">{{msge}}</p>{% endif %}
-                        <h5>
-                            {{user.first_name}} {{user.last_name}}
-                        </h5>
-                        <h6>
-                            {{user.username}}
-                        </h6>
+            </div>
+            <div class="col-md-6">
+                <div class="profile-head">
+                    <h5>
+                        {{user.first_name}} {{user.last_name}}
+                    </h5>
+                    <h6>
+                        {{user.username}}
+                    </h6>
 
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item">
-                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Timeline</a>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Timeline</a>
+                        </li>
+                    </ul>
                 </div>
-
             </div>
 
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="profile-work">
+                    <p>Contect</p>
+                    {{user.student.contect}}
+
+                </div>
+            </div>
             <div class="col-md-8">
                 <div class="tab-content profile-tab" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -169,23 +168,15 @@
                                 <label>User Id</label>
                             </div>
                             <div class="col-md-6">
-                                <input type="text" class="form-control" name="username" id="username" value="{{user.username}}" required>
+                                {{user.username}}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label>First Name</label>
+                                <label>Name</label>
                             </div>
                             <div class="col-md-6">
-                                <p> <input type="text" class="form-control" name="first_name" id="first_name" value="{{user.first_name}}" required></p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Last Name</label>
-                            </div>
-                            <div class="col-md-6">
-                                <p> <input type="text" class="form-control" name="last_name" id="last_name" value="{{user.last_name}}" required></p>
+                                <p> {{user.first_name}} {{user.last_name}}</p>
                             </div>
                         </div>
                         <div class="row">
@@ -193,7 +184,7 @@
                                 <label>Year</label>
                             </div>
                             <div class="col-md-6">
-                                <p> <input type="text" class="form-control" name="year" id="year" value="{{user.student.year}}" required>
+                                <p>{{user.student.year}}
                                 </p>
                             </div>
                         </div>
@@ -202,24 +193,10 @@
                                 <label>Major</label>
                             </div>
                             <div class="col-md-6">
-                                <p><input type="text" class="form-control" name="major" id="year" value="{{user.student.major}}" required>
+                                <p>{{user.student.major}}
                                 </p>
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Major</label>
-                            </div>
-                            <div class="col-md-6">
-                                <p>
-
-                                    <input type="text" class="form-control" name="contect" id="year" value="{{user.student.contect}}" required>
-                                </p>
-                            </div>
-                        </div>
-
-
 
                     </div>
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -228,49 +205,22 @@
                                 <label>Project Experience</label>
                             </div>
                             <div class="col-md-6">
-                                name : <input type="text" class="form-control" name="name" id="name" value="{{user.project_ex.name}}" placeholder="" required> </br>
-                                topic : <input type="text" class="form-control" name="Project_topic" id="Project_topic" value="{{user.project_ex.Project_topic}}" placeholder="" required> </br>
-
-                                desc : <textarea class="form-control" rows="3" name="desc" id="desc" value="{{user.project_ex.desc}}" placeholder="" required></textarea>
+                                name : {{user.project_ex.name}} </br> project topic :{{user.project_ex.Project_topic}}</br> describtion : {{user.project_ex.desc}}
 
                             </div>
                         </div>
 
                     </div>
                 </div>
-            </div> <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
-            <button type="submit" class="btn btn-info ml-3">Update</button>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-2">
+
+        <form action="{% url 'find_project_user_profile_view' user_id=user.id %}">
+
+            <button type="submit" class="btn btn-warning ml-3">Edit</button>
+        </form>
+    </div>
 </div>
-
-</form>
-</div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% endblock %}

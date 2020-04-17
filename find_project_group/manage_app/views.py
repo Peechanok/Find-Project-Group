@@ -8,7 +8,7 @@ from django.http import HttpResponse, request
 from django.shortcuts import redirect, render
 from django.urls.base import is_valid_path
 
-from .models import Student,Course
+from .models import Student,Course,Project
 
 def selectCouse(request):
     coursall = Course.objects.all()
@@ -62,4 +62,57 @@ def deleteCourse(request,course_id):
     course = Course.objects.get(id=course_id)
     course.delete()
     return redirect(to='view_course')
- 
+
+# ส่วนของหน้า Project
+
+def selectProject(request):
+    projectall = Project.objects.all()
+    return render(request, 'manage_app/project.html',context={
+        'projectall': projectall,}
+    )
+
+def viewaddProject(request):
+    project = Project.objects.all()
+
+    return render(request, 'manage_app/add_project.html',context={'project':project})
+
+@login_required   
+@permission_required('manage_app.add_project')
+def addProject(request):
+    msg_p = ''
+    
+    if request.method == 'POST':
+        project = Project.objects.create(
+            
+            name=request.POST.get('name'),
+            desc=request.POST.get('desc'),
+           
+        )
+        
+        msg_p = 'Successfully create new name project'
+    else:
+        project = Project.objects.none()
+
+    context = {
+       
+       'project':project,
+        'msg_p': msg_p
+    }
+
+    return render(request, 'manage_app/add_project.html', context=context)
+
+@login_required   
+@permission_required('manage_app.delete_project')
+def viewProject(request):
+    project = Project.objects.all()
+
+    return render(request, 'manage_app/view_project.html',context={'project':project})
+
+def deleteProject(request,project_id):
+    """
+        ลบข้อมูล course โดยลบข้อมูลที่มี id = course_id
+    """
+    project = Project.objects.get(id=project_id)
+    project.delete()
+    return redirect(to='view_project')
+

@@ -1,14 +1,19 @@
 
+from builtins import object
+
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required,permission_required
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.db.models import Count
 from django.forms import models
 from django.http import HttpResponse, request
 from django.shortcuts import redirect, render
 from django.urls.base import is_valid_path
 
-from .models import Student,Course,Project
+from .models import (Course, Course_Assign, Group, Project, Student,
+                     Student_Join, Student_Create)
+
 
 def selectCouse(request):
     coursall = Course.objects.all()
@@ -65,54 +70,134 @@ def deleteCourse(request,course_id):
 
 # ส่วนของหน้า Project
 
-def selectProject(request):
-    projectall = Project.objects.all()
+def selectProject(request, course_id):
+    course = Course.objects.get(pk=course_id)
+    projectall = Course_Assign.objects.filter(course=course)
     return render(request, 'manage_app/project.html',context={
-        'projectall': projectall,}
+        'projectall': projectall,
+        'course' : course,}
     )
-
-def viewaddProject(request):
-    project = Project.objects.all()
-
-    return render(request, 'manage_app/add_project.html',context={'project':project})
 
 @login_required   
 @permission_required('manage_app.add_project')
-def addProject(request):
+def addProject(request, course_id):
     msg_p = ''
-    
+    course = Course.objects.get(pk=course_id)
+
     if request.method == 'POST':
         project = Project.objects.create(
             
             name=request.POST.get('name'),
             desc=request.POST.get('desc'),
-           
+            min_member=request.POST.get('min_member'),
+            mex_member=request.POST.get('mex_member'),
         )
-        
+        project.save()
+        course_a = Course_Assign.objects.create(
+            project=project ,
+            course=course
+        )
+        course_a.save()
         msg_p = 'Successfully create new name project'
+        return redirect('find_project_project', course_id=course_id)
     else:
         project = Project.objects.none()
 
     context = {
        
        'project':project,
-        'msg_p': msg_p
+        'msg_p': msg_p,
+        'course': course
     }
 
     return render(request, 'manage_app/add_project.html', context=context)
 
-@login_required   
-@permission_required('manage_app.delete_project')
-def viewProject(request):
-    project = Project.objects.all()
-
-    return render(request, 'manage_app/view_project.html',context={'project':project})
-
-def deleteProject(request,project_id):
-    """
-        ลบข้อมูล course โดยลบข้อมูลที่มี id = course_id
-    """
+def deleteProject(request, course_id, project_id):
+    course = Course.objects.get(pk=course_id)
     project = Project.objects.get(id=project_id)
     project.delete()
-    return redirect(to='view_project')
+    return redirect('find_project_project', course_id=course_id)
 
+
+
+@login_required   
+def viewGroup(request, course_id, project_id):
+    search = request.GET.get('search', '')
+    groups = Student_Create.objects.filter(group_id__project_id__id = project_id).filter(group_id__name__icontains = search).annotate(num_member=Count('student'))
+    project = Project.objects.get(pk = project_id)
+    course = Course.objects.get(pk = course_id)
+
+    return render(request, 'manage_app/group.html',context={'groups':groups, 
+                                                                'project' : project,
+                                                                'course' : course,
+                                                                'search': search})
+@login_required   
+def addGroup(request, course_id, project_id):
+    project = Project.objects.get(pk = project_id)
+    course = Course.objects.get(pk = course_id)
+    if request.method == 'POST':
+        
+        group = Group.objects.create(    
+            name=request.POST.get('name'),
+            project_topic=request.POST.get('desc'),
+            project_id = project,
+        )
+        join = Student_Join.objects.create(    
+            group=group,
+            student=Student.objects.get(user=request.user),
+        )
+        create = Student_Create.objects.create(    
+            group=group,
+            student=Student.objects.get(user=request.user),
+        )
+        return redirect('view_group', course_id=course_id, project_id= project_id)
+    else:
+        group = Group.objects.none()
+
+    
+
+    context = {
+       'group':group,
+       'project' : project,
+        'course' : course,
+    }
+
+    return render(request, 'manage_app/add_group.html', context=context)                                                    
+
+
+@login_required   
+def viewMember(request, course_id, project_id, group_id):
+    course = Course.objects.get(pk = course_id)
+    group = Group.objects.get(pk = group_id)
+    members = Student_Join.objects.filter(group_id = group_id).annotate(num_member=Count('student'))
+    creater = Student_Create.objects.get(group_id = group_id)
+    project = Project.objects.get(pk = project_id)
+    
+    return render(request, 'manage_app/member.html',context={'group':group, 
+                                                                'project' : project,
+                                                                'members' : members,
+                                                                'course' : course,
+                                                                'creater': creater})
+
+@login_required   
+def addMember(request, course_id, project_id, group_id):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        stusent = Student.objects.get(user_id__username = username)
+        join = Student_Join.objects.create(
+                student_id = stusent.id,
+                group_id = group_id,
+            )  
+        join.save()
+    
+    return redirect('view_member', course_id, project_id, group_id)
+
+@login_required   
+def deleteMember(request, course_id, project_id, group_id, user_id):
+    join = Student_Join.objects.filter(
+        student_id = user_id,
+                group_id = group_id,
+    )  
+    join.delete()
+    
+    return redirect('view_member', course_id, project_id, group_id)

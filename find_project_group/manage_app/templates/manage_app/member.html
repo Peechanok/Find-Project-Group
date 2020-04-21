@@ -1,0 +1,210 @@
+{% extends 'base.html' %} 
+
+{% block content %} 
+{% load static %}
+
+<style>
+    body {
+        background: -webkit-linear-gradient(left, #D96767, #214785, #EAC9B8);
+    }
+    
+    .emp-profile {
+        padding: 3%;
+        margin-top: 3%;
+        margin-bottom: 3%;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+    
+    .profile-img {
+        text-align: center;
+    }
+    
+    .profile-img img {
+        width: 70%;
+        height: 100%;
+    }
+    
+    .profile-img .file {
+        position: relative;
+        overflow: hidden;
+        margin-top: -20%;
+        width: 70%;
+        border: none;
+        border-radius: 0;
+        font-size: 15px;
+        background: #212529b8;
+    }
+    
+    .profile-img .file input {
+        position: absolute;
+        opacity: 0;
+        right: 0;
+        top: 0;
+    }
+    
+    .profile-head h5 {
+        color: #333;
+    }
+    
+    .profile-head h6 {
+        color: #0062cc;
+    }
+    
+    .profile-edit-btn {
+        border: none;
+        border-radius: 1.5rem;
+        width: 70%;
+        padding: 2%;
+        font-weight: 600;
+        color: #6c757d;
+        cursor: pointer;
+    }
+    
+    .proile-rating {
+        font-size: 12px;
+        color: #818182;
+        margin-top: 5%;
+    }
+    
+    .proile-rating span {
+        color: #495057;
+        font-size: 15px;
+        font-weight: 600;
+    }
+    
+    .profile-head .nav-tabs {
+        margin-bottom: 5%;
+    }
+    
+    .profile-head .nav-tabs .nav-link {
+        font-weight: 600;
+        border: none;
+    }
+    
+    .profile-head .nav-tabs .nav-link.active {
+        border: none;
+        border-bottom: 2px solid #0062cc;
+    }
+    
+    .profile-work {
+        padding: 14%;
+        margin-top: -15%;
+    }
+    
+    .profile-work p {
+        font-size: 12px;
+        color: #818182;
+        font-weight: 600;
+        margin-top: 10%;
+    }
+    
+    .profile-work a {
+        text-decoration: none;
+        color: #495057;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .profile-work ul {
+        list-style: none;
+    }
+    
+    .profile-tab label {
+        font-weight: 600;
+    }
+    
+    .profile-tab p {
+        font-weight: 600;
+        color: #0062cc;
+    }
+</style>
+
+<style>
+.form-popup {
+  display: none;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+
+.form-container .btn {
+  width: 50%;
+}
+</style>
+
+
+<div class="container emp-profile">
+<h1>Gruop : {{project.name}}</h1>
+<table class="table">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col" colspan = '4'>Group : {{group.group_id.name}}</th>
+    </tr>
+    <tr>
+      <th scope="col">ชื่อ</th>
+      <th scope="col">นามสกุล</th>
+      <th scope="col">แขนง</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for member in members %}
+    <tr>
+      <td>{{member.student.user.first_name}}</td>
+      <td>{{member.student.user.last_name}}</td>
+      <td>{{member.student.major}}</td>
+      <td><a href="{% url 'find_project_user_profile' user_id=member.student.user_id %}" class="btn btn-outline-warning" role="button">View</a>
+      <a href="{% url 'delete_member' course_id=course.id  project_id=project.id group_id=group.id user_id=member.student.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<button id ="open-button" class="btn btn-success" >Join Member</button>
+
+<div class="form-popup" id="myForm">
+
+  <form method = 'POST' action="{% url 'add_member' course_id=course.id  project_id=project.id group_id=group.id%}" class="form-container">
+    {% csrf_token %}
+    <h3>Add member</h3>
+
+    <label for="email"><b>username :</b></label>
+    <input type="text" class= 'form-control' placeholder="Enter username" name="username" required>
+    </br>
+    <button type="submit" class="btn btn-success">Add</button>
+  </form>
+</div>
+
+<script>
+button = document.getElementById("open-button");
+button.addEventListener("click", openForm);
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+  button.removeEventListener("click", openForm);
+  button.innerHTML = 'Close';
+  button.style.background = 'red';
+  button.addEventListener("click", closeForm);
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+  button.removeEventListener("click", closeForm);
+  button.innerHTML = 'Join Member';
+  button.style.background = 'green';
+  button.addEventListener("click", openForm);
+}
+
+</script>
+
+</div>
+
+
+{% endblock %}

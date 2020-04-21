@@ -117,18 +117,20 @@
     }
 </style>
 <div class="container emp-profile">
-    <h1> Project</h1>
-    <form class="form-inline" method="GET" action="{% url 'find_project_project' %}">
+    <h1> Project : {{course.name}} </h1>
+    <form class="form-inline" method="GET" action="">
         <div class="row">
            
             <div class="col-md">
                   <table class="table">
                 <tbody>
-                    {% for item in coursall %}
-                    <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br></br></br>
+                    {% for item in projectall %}
+                    <td> Name: {{ item.project.name }}</br> Describtion : {{ item.project.desc }} </br>
+                         max of group: {{ item.project.mex_member }} </br> min of group: {{ item.project.min_member }}</br></br></br>
                         <form>
 
-                            <button type="submit" class="btn btn-info ml-3">Open</button>
+                            <a href="{% url 'view_group' course_id=course.id project_id=item.project.id %}" type="submit" class="btn btn-info ml-3">Open</a>
+                            <a type="submit" class="btn btn-info ml-3" href="{% url 'delete_project' project_id=item.project.id course_id=course.id %}">Delete</a>
                         </form>
                     </td>
                     </br> {% endfor %}
@@ -138,17 +140,17 @@
 
     </form></br></br>
     <div class="row">
-     <div class="col-md-2"> {%if perms.manage_app.add_course%}
-        <form action="{% url 'add_project' %}">
+     <div class="col-md-7"> {%if perms.manage_app.add_course%}
+        <form action="{% url 'add_project_submits' course_id=course.id %}">
 
-            <button type="submit" class="btn btn-warning ml-3">Create Project</button>
+            <button type="submit" class="btn btn-warning ml-3" >Create Project</button>
         </form>{% endif %}</div>
 
-     <div class="col-md-10"> {%if perms.manage_app.delete_course%}
-        <form action="{% url 'view_course' %}">
+     {% comment %} <div class="col-md-5"> {%if perms.manage_app.delete_course%}
+        <form action="{% url 'view_project' %} ">
 
-            <button type="submit" class="btn btn-danger ml-3">Delete Project</button>
-        </form>{% endif %}</div>
+            <button type="submit" class="btn btn-danger ml-2">Delete Project</button>
+        </form>{% endif %}</div> {% endcomment %}
     </div>
     
  

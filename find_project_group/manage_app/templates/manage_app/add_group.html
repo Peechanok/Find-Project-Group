@@ -1,4 +1,7 @@
-{% extends 'base.html' %} {% block content %} {% load static %}
+{% extends 'base.html' %} 
+
+{% block content %} 
+{% load static %}
 
 <style>
     body {
@@ -117,79 +120,34 @@
     }
 </style>
 <div class="container emp-profile">
-    <form class="form-inline" method="GET" action="{% url 'find_project_couse' %}">
-        <div class="row">
-           
-            <div class="col-md">
-                  <table class="table">
-                <tbody>
-                    {% for item in coursall %}
-                    <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br></br></br>
-                        {%if perms.manage_app.add_course%}
-
-                            <a type="submit" class="btn btn-info ml-3" href="{% url 'find_project_project' course_id=item.id %}">Open</a>
-                        {% endif %}
-                    </td>
-                    </br> {% endfor %}
-
-                </tbody>
-            </table>
-
-    </form></br></br>
-    <div class="row">
-     <div class="col-md-2"> {%if perms.manage_app.add_course%}
-        <form action="{% url 'add_course' %}">
-
-            <button type="submit" class="btn btn-warning ml-3">Create Course</button>
-        </form>{% endif %}</div>
-
-     <div class="col-md-10"> {%if perms.manage_app.delete_course%}
-        <form action="{% url 'view_course' %}">
-
-            <button type="submit" class="btn btn-danger ml-3">Delete Course</button>
-        </form>{% endif %}</div>
-    </div>
-    
- 
-            </div>
-
-        </div>
+     <h1>Create Group</h1>
+  <form method="POST" action="{% url 'add_group' course_id=course.id project_id=project.id %}">
+        {% csrf_token %}
+       
         <div class="row">
             <div class="col-md-4">
 
-
             </div>
-            <div class="col-md-8">
- 
+            <div class="col-md-6">
+             <div class="form-row">
+                <div class="form-group col-4">
+                    <label for="section">Group name</label>
+               
+                    <input type="text" class="form-control" name="name" id="name"  required>
+                </div>
+                <div class="form-group col-6">
+                    <label for="section">Project topic:</label>
+                    <input type="text" class="form-control" name="desc" id="desc" required>
+                </div>
+             </div>
+              
+            <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
+            <button type="submit" class="btn btn-info ml-3">Submit</button>
             </div>
-
 
         </div>
     </form>
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 {% endblock %}

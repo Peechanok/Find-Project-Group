@@ -17,7 +17,7 @@ urlpatterns = [
 path('view_group/<int:course_id>/<int:project_id>/',views.viewGroup, name='view_group') ,
 path('view_group/<int:course_id>/<int:project_id>/add',views.addGroup, name='add_group') ,
 path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/',views.viewMember, name='view_member') ,
-path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/add',views.addMember, name='add_member') ,
+path('view_group/load/<int:group_id>/',views.loadMember, name='loadMember') ,
 path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/<int:user_id>/delete',views.deleteMember, name='delete_member') ,
 
 

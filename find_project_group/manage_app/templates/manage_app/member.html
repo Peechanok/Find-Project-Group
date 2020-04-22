@@ -2,7 +2,7 @@
 
 {% block content %} 
 {% load static %}
-
+<body onload = 'initialize ()'>
 <style>
     body {
         background: -webkit-linear-gradient(left, #D96767, #214785, #EAC9B8);
@@ -142,28 +142,35 @@
 </style>
 
 
-<div class="container emp-profile">
-<h1>Gruop : {{project.name}}</h1>
+<div class="container emp-profile" >
+<h1>Gruop {{course.name}} : {{project.name}}</h1>
+</br>
 <table class="table">
   <thead class="thead-light">
     <tr>
-      <th scope="col" colspan = '4'>Group : {{group.group_id.name}}</th>
+      <th scope="col" colspan = '5'>Group : {{group.name}}</th>
     </tr>
     <tr>
+      <th scope="col">#</th>
       <th scope="col">ชื่อ</th>
       <th scope="col">นามสกุล</th>
       <th scope="col">แขนง</th>
       <th scope="col"></th>
     </tr>
   </thead>
-  <tbody>
+  <tbody id ='t-body'>
     {% for member in members %}
     <tr>
+      <td>{{forloop.counter}}</td>
       <td>{{member.student.user.first_name}}</td>
       <td>{{member.student.user.last_name}}</td>
       <td>{{member.student.major}}</td>
-      <td><a href="{% url 'find_project_user_profile' user_id=member.student.user_id %}" class="btn btn-outline-warning" role="button">View</a>
-      <a href="{% url 'delete_member' course_id=course.id  project_id=project.id group_id=group.id user_id=member.student.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
+      <td >
+      <a href="{% url 'find_project_user_profile' user_id=member.student.user_id %}" class="btn btn-outline-warning" role="button"><i class="far fa-eye"></i></a>
+      <button onclick = "initialize()" type="button" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
+      <!--
+       <a href="{% url 'delete_member' course_id=course.id  project_id=project.id group_id=group.id user_id=member.student.id %}" class="btn btn-outline-danger" role="button">Delete</a>-->
+      </td>
     </tr>
     {% endfor %}
   </tbody>
@@ -172,20 +179,22 @@
 
 <div class="form-popup" id="myForm">
 
-  <form method = 'POST' action="{% url 'add_member' course_id=course.id  project_id=project.id group_id=group.id%}" class="form-container">
+ 
     {% csrf_token %}
-    <h3>Add member</h3>
+    <div class='form-container'>
+    <h3>Add Someone</h3>
 
     <label for="email"><b>username :</b></label>
-    <input type="text" class= 'form-control' placeholder="Enter username" name="username" required>
+    <input id = 'user' type="text" class= 'form-control' placeholder="Enter username" name="username" required>
     </br>
-    <button type="submit" class="btn btn-success">Add</button>
-  </form>
+    <button onclick='addMember ()' type="submit" class="btn btn-success">Add</button>
+    </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-button = document.getElementById("open-button");
+let button = document.getElementById("open-button");
 button.addEventListener("click", openForm);
+
 function openForm() {
   document.getElementById("myForm").style.display = "block";
   button.removeEventListener("click", openForm);
@@ -201,10 +210,128 @@ function closeForm() {
   button.style.background = 'green';
   button.addEventListener("click", openForm);
 }
-
 </script>
 
-</div>
+<script>
+        // const axios = require('axios');
+  var items = []
+  axios.defaults.xsrfCookieName = 'csrftoken'
+  axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
+  let num = 1
+  function initialize () {
+    axios.get("{% url 'loadMember' group_id=group.id %}")
+    .then(function (response) {
+      // handle success
+      console.log('hello')
+      
+      items = response.data
+      items.forEach((item) => {
+        let name = item.student_detail.user.first_name
+        let surname = item.student_detail.user.last_name
+        let major = item.student_detail.major
+        let id = item.student_detail.user.id
 
+        let tr = createMember(id, num, name, surname, major)
+        let tbody = document.querySelector('#t-body')
+        tbody.appendChild(tr)
+        num++
+      })
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+    .then(function () {
+      // always executed
+    });
+  }
+
+  function addMember () {
+    let textInput = document.querySelector('#user')
+    let text = textInput.value
+    let group = '{{group.id}}'
+
+            // Send AJAX resuest to create in the DB
+    axios.post("{% url 'loadMember' group_id=group.id %}", {
+      user: text,
+      group: group,
+    })
+    .then(function (response) {
+      // handle success
+      console.log('hello')
+      
+      item = response.data
+
+        let name = item.student_detail.user.first_name
+        let surname = item.student_detail.user.last_name
+        let major = item.student_detail.major
+        let id = item.student_detail.user.id
+
+        let tr = createMember(id, num, name, surname, major)
+        let tbody = document.querySelector('#t-body')
+        tbody.appendChild(tr)
+        num++
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+    .then(function () {
+      // always executed
+    });
+  }
+        
+  function createMember(id,num, name, surname, major){
+      let creater = '{{creater.student.user.id}}'
+      let tr = document.createElement('tr')
+      let td = document.createElement('td')
+      if (creater == id){
+        td.innerHTML = num+ " <b class='text-success'>(หัวหน้ากลุ่ม)</b>"
+      }
+      else{
+        td.innerText = num
+      }
+      tr.appendChild(td)
+      
+      td = document.createElement('td')
+      td.innerText = name
+      tr.appendChild(td)
+
+      td = document.createElement('td')
+      td.innerText = surname
+      tr.appendChild(td)
+
+      td = document.createElement('td')
+      td.innerText = major
+      tr.appendChild(td)
+
+      
+      td = document.createElement('td')
+      let a = document.createElement('a')
+      a.innerHTML = '<i class="far fa-eye"></i>'
+      a.className ='btn btn-outline-warning'
+      let link = "{% url 'find_project_user_profile' 999 %}".replace('999',id)
+      a.href = link
+      
+
+      let button = document.createElement('button')
+      button.className ='btn btn-danger'
+      button.innerHTML = '<i class="far fa-trash-alt">'
+      button.type = 'button'
+      button.addEventListener("click", initialize)
+      td.appendChild(a)
+      td.appendChild(button)
+      tr.appendChild(td)
+      
+  
+      return tr
+      
+  }
+
+  
+
+</script>
+</div>
+</body>
 
 {% endblock %}

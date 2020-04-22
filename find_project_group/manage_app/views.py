@@ -1,5 +1,6 @@
 
 from builtins import object
+from django.http import JsonResponse
 from venv import create
 
 from django.contrib.auth import authenticate, login, logout
@@ -8,12 +9,15 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.db.models import Count
 from django.forms import models
-from django.http import HttpResponse, request
+from django.http import HttpResponse, JsonResponse, request
 from django.shortcuts import redirect, render
 from django.urls.base import is_valid_path
 
+from rest_framework.decorators import api_view
+
 from .forms import *
 from .models import *
+from .serializers import *
 
 
 def selectCouse(request):
@@ -239,6 +243,24 @@ def viewMember(request, course_id, project_id, group_id):
                                                                 'members' : members,
                                                                 'course' : course,
                                                                 'creater': creater})
+@api_view(['GET',"POST"])
+def loadMember(request, group_id):
+    if request.method == 'GET':
+        items = Student_Join.objects.filter(group=group_id)
+        serializer = Student_JoinSerializer(items, many=True)
+        return JsonResponse(serializer.data, status=200, safe = False)
+
+    elif request.method == 'POST':
+        inp = request.data
+        data = {}
+        student = Student.objects.get(user__username=inp['user'])
+        data['group'] = inp['group']
+        data['student'] = student.id
+        serializer = Student_JoinSerializer(data = data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201, safe = False)
+        return JsonResponse(serializer.errors, status=400, safe = False)
 
 @login_required   
 def addMember(request, course_id, project_id, group_id):
@@ -255,9 +277,9 @@ def addMember(request, course_id, project_id, group_id):
 
 @login_required   
 def deleteMember(request, course_id, project_id, group_id, user_id):
-    join = Student_Join.objects.filter(
+    join = Student_Join.objects.get(
         student_id = user_id,
-                group_id = group_id,
+        group_id = group_id,
     )  
     join.delete()
     

@@ -14,9 +14,11 @@ from django.db import IntegrityError
 from django.forms import models
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import is_valid_path
 from django.urls.base import is_valid_path
 
-from manage_app.models import Student,Project_experience
+from manage_app.forms import StudentForm
+from manage_app.models import Project_experience, Student
 
 # Create your views here.
 
@@ -70,8 +72,9 @@ def sign_in(request):
         เพิ่มข้อมูล user / student ใหม่เข้าสู่ฐานข้อมูล
     """
     msg = ''
-
+    
     if request.method == 'POST':
+        
         user = User.objects.create_user(
             request.POST.get('username'),
             request.POST.get('email'),
@@ -94,7 +97,8 @@ def sign_in(request):
 
     context = {
         'student': user,
-        'msge': msge
+        'msge': msge,
+        
     }
 
     return render(request, 'Loginindex.html', context=context)
@@ -111,7 +115,9 @@ def change_password(request):
         if password1 == password2:
             user.set_password(password2)
             user.save()
-            redirect('login')
+            
+            return redirect('find_project_login')
+            
         else:
            context['password1'] = password1
            context['password2'] = password2
@@ -123,34 +129,7 @@ def change_password(request):
 
     return render(request, template_name='change_password.html', context=context)
 
-@login_required
-def update_profile(request,user_id):
-    """
-        Update ข้อมูลชั้นเรียนที่มี id = class_id
-    """
-    
-    try:
-        user = User.objects.get(pk=user_id)
-        msg = ''
-    except User.DoesNotExist:
-        return redirect('find_ptoject_home')
 
-    if request.method == 'POST':
-        user.username=request.POST.get('username')
-        user.email=request.POST.get('email')
-        user.first_name=request.POST.get('first_name')
-        user.last_name=request.POST.get('last_name')
-        
-        
-        user.save()
-        msg = 'Successfully ffupdate student - username: %s' % (user.username)
-        
-    context = {
-        
-        'msg': msg
-    }
-
-    return render(request, template_name='manage_app/home.html', context=context)
 
 
 @login_required
@@ -158,7 +137,8 @@ def update_profile(request,user_id):
     """
         Update ข้อมูลนักเรียนที่มี id = user_id
     """
-    
+    studentt = request.user.student
+    form = StudentForm(instance=studentt)
     try:
         user = User.objects.get(pk=user_id)
         msge = ''
@@ -166,6 +146,9 @@ def update_profile(request,user_id):
         return redirect('find_project_home')
 
     if request.method == 'POST':
+        form = StudentForm(request.POST, request.FILES,instance=studentt)
+        if form.is_valid():
+            form.save()
         user.username=request.POST.get('username')
         user.first_name=request.POST.get('first_name')
         user.last_name=request.POST.get('last_name')
@@ -178,23 +161,17 @@ def update_profile(request,user_id):
             user=user,
             year=request.POST.get('year'),
             major=request.POST.get('major'),
-            contect=request.POST.get('contect')
+            contect=request.POST.get('contect'),
         )
         user.save()
-      #  project_ex = Project_experience.objects.create(
-           
-            
-           # Project_topic=request.POST.get('Project_topic'),
-           # desc=request.POST.get('desc')
-      #  )
-      #  project_ex.name.add(user_request.get("user"))
-      #  project_ex.save()
+     
         msge = 'Successfully update student - username: %s' % (user.username)
     
     context = {
         'student': user,
         'msge': msge,
-      #  'project_ex' : project_ex
+        'form':form,
+     
     }
 
     return render(request, 'update_profile.html', context=context)
@@ -203,13 +180,15 @@ def update_profile(request,user_id):
 
 def view_update_profile(request,user_id):
     user = User.objects.get(pk=user_id)
-    
+    studentt = request.user.student
+    form = StudentForm(instance=studentt)
     student = Student.objects.all()
     project_ex = Project_experience.objects.all()
     context = {
         'student': student,
         'user': user,
-        'project_ex':project_ex
+        'project_ex':project_ex,
+        'form':form,
     }
     return render(request, 'update_profile.html',context=context)
 

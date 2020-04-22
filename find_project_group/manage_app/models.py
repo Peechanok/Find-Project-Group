@@ -9,7 +9,7 @@ class Student(models.Model):
    year = models.IntegerField()
    contect = models.CharField( max_length=50)
    major = models.CharField( max_length=50)
-
+   profile_pic = models.ImageField(null =True, blank=True)
 class Admin(models.Model):
    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
 
@@ -18,6 +18,7 @@ class Project_experience(models.Model):
    name = models.CharField( max_length=50)
    Project_topic = models.CharField( max_length=50)
    desc = models.TextField()
+  
 
 class Student_experience(models.Model):
    experience = models.ForeignKey(Project_experience, on_delete=models.CASCADE)

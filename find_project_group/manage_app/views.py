@@ -1,5 +1,6 @@
 
 from builtins import object
+from venv import create
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
@@ -11,8 +12,8 @@ from django.http import HttpResponse, request
 from django.shortcuts import redirect, render
 from django.urls.base import is_valid_path
 
-from .models import (Course, Course_Assign, Group, Project, Student,
-                     Student_Join, Student_Create)
+from .forms import *
+from .models import *
 
 
 def selectCouse(request):
@@ -22,11 +23,54 @@ def selectCouse(request):
     )
 
 
+def viewpro_ex(request):
+    
+
+    return render(request, 'manage_app/add_project_ex.html')
+
 
 def viewaddCourse(request):
     course = Course.objects.all()
 
     return render(request, 'manage_app/add_course.html',context={'course':course})
+
+def addpro_ex(request, student_id):
+    
+    
+    msg_p = ''
+    student = Student.objects.get(pk=student_id)
+
+    if request.method == 'POST':
+        experience = Project_experience.objects.create(
+           
+            name=request.POST.get('name'),
+            Project_topic=request.POST.get('Project_topic'),
+            desc=request.POST.get('desc'),
+            
+        )
+        experience.save()
+        stu_proex =Student_experience.objects.create(
+            experience=experience,
+            student=student,
+        ) 
+        stu_proex.save()
+        msg_p = 'Successfully create new  project experience'
+    
+  
+    else:  
+        experience = Project_experience.objects.none() 
+        stu_proex = Student_experience.objects.none() 
+    context = {
+       
+       'experience':experience,
+        'msg_p': msg_p,
+        'student': student,
+        'stu_proex':stu_proex
+    }
+
+    return render(request, 'manage_app/add_project_ex.html', context=context)
+
+
 
 
 @login_required   
@@ -39,9 +83,23 @@ def addCourse(request):
             
             name=request.POST.get('name'),
             desc=request.POST.get('desc'),
+
            
         )
-        
+        course.save()
+        teacher=Teacher.objects.create(
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+            contect=request.POST.get('contect'),
+            
+        )
+        teacher.save()
+        tea_course=Taught_By.objects.create(
+            course=course,
+            teacher=teacher,
+
+        )
+        tea_course.save()
         msg = 'Successfully create new name courese'
     else:
         course = Course.objects.none()
@@ -49,7 +107,10 @@ def addCourse(request):
     context = {
        
        'course':course,
-        'msg': msg
+        'msg': msg,
+        'teacher':teacher,
+        'tea_course':tea_course
+
     }
 
     return render(request, 'manage_app/add_course.html', context=context)

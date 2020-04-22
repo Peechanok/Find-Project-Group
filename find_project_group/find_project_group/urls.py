@@ -26,7 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('manage_app.urls')),
     path('', include('manage_project.urls')),
-] 
-if settings.DEBUG:
-    urlpatterns = urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]  
 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

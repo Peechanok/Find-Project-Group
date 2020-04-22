@@ -117,10 +117,10 @@
     }
 </style>
 <div class="container emp-profile">
-     <h1>Create New couse</h1>
-  <form method="POST" action="{% url 'add_course_submits' %}">
+     <h1>Create New Project</h1>
+  <form method="POST" action="{% url 'find_project_add_pro_ex'  student_id=user.student.id %}">
         {% csrf_token %}
-            {% if msg %}<p class="text-success">{{msg}}</p>{% endif %}      <!-- Submit to add_couse view -->
+            {% if msg_p %}<p class="text-success">{{msg_p}}</p>{% endif %}      <!-- Submit to add_couse view -->
        
         <div class="row">
             <div class="col-md-4">
@@ -128,29 +128,26 @@
             </div>
             <div class="col-md-6">
              <div class="form-row">
-                <div class="form-group col-4">
-                    <label for="section">Course name</label>
+                <div class="form-group col-6">
+                    <label for="section">Project name</label>
                
                     <input type="text" class="form-control" name="name" id="name"  required>
                 </div>
                 <div class="form-group col-6">
+                    <label for="section">Project_topic</label>
+               
+                    <input type="text" class="form-control" name="Project_topic" id="Project_topic"  required>
+                </div>
+                <div class="form-group col-12">
                     <label for="section">Description:</label>
                     <textarea row ="3" class="form-control" name="desc" id="desc" required>
                 </textarea></div>
-                 <div class="form-group col-6">
-                    <label for="section">Teacher name</label></br>
-               
-                    First name: <input type="text" class="form-control" name="first_name" id="first_name"  required></br>
-                    Last name: <input type="text" class="form-control" name="last_name" id="last_name"  required>
-                </div>
-                <div class="form-group col-6">
-                    <label for="section">Contect:</label>
-                    <textarea row ="3" class="form-control" name="contect" id="contect" required>
-                </textarea></div>
+                
+              
              </div>
               
             <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
-            <button type="submit" class="btn btn-info ml-3">Submit</button>
+            <button type="submit" class="btn btn-info ml-3" >Submit</button>
             </div>
 
         </div>

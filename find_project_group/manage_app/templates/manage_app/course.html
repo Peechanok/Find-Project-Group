@@ -125,10 +125,10 @@
                 <tbody>
                     {% for item in coursall %}
                     <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br></br></br>
-                        {%if perms.manage_app.add_course%}
+                       
 
                             <a type="submit" class="btn btn-info ml-3" href="{% url 'find_project_project' course_id=item.id %}">Open</a>
-                        {% endif %}
+                        
                     </td>
                     </br> {% endfor %}
 

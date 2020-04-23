@@ -5,6 +5,9 @@
 
 
 <div class="container emp-profile" >
+{% if user.id == creater.student.user.id %}
+<a href="{% url 'delete_group' course_id=course.id project_id=project.id group_id=group.id%}" class="btn btn-danger float-right">Delete Group</a>
+{% endif %}
 <h1>Gruop {{course.name}} : {{project.name}}</h1>
 </br>
 <table class="table">
@@ -29,7 +32,7 @@
       <td>{{member.student.major}}</td>
       <td >
       <a href="{% url 'find_project_user_profile' user_id=member.student.user_id %}" class="btn btn-outline-warning" role="button"><i class="far fa-eye"></i></a>
-      {% if user.id == creater.student.user.id and  member.student.user.id != creater.student.user.id %}
+      {% if user.id == creater.student.user.id and  member.student.user.id != creater.student.user.id and perms.manage_app.delete_student_join %}
       <a href="{% url 'delete_member' course_id=course.id  project_id=project.id group_id=group.id user_id=member.student.id %}" class="btn btn-outline-danger" role="button"><i class="far fa-trash-alt"></i></a>
       {% endif %}
       </td>
@@ -40,6 +43,7 @@
 {% if error %}
   <p class = "text-danger">{{error}}</p>
 {% endif %}
+{% if user.id == creater.student.user.id %}
 <button id ="open-button" class="btn btn-success" >Join Member</button>
 
 <div class="form-popup" id="myForm">
@@ -56,7 +60,7 @@
     <button  type="submit" class="btn btn-success">Add</button>
     </div>
 </div>
-
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 let button = document.getElementById("open-button");

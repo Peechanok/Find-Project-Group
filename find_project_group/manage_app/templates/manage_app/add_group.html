@@ -25,7 +25,9 @@
                     <input type="text" class="form-control" name="desc" id="desc" required>
                 </div>
              </div>
-              
+              {% if error %}
+                <p class = "text-danger">{{error}}</p>
+              {% endif %}
             <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
             <button type="submit" class="btn btn-info ml-3">Submit</button>
             </div>

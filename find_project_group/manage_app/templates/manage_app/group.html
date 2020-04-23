@@ -5,10 +5,14 @@
 
 
 <div class="container emp-profile">
+{% if perms.manage_app.add_group %}
 <a href="{% url 'add_group' course_id=course.id project_id=project.id %}" class="btn btn-warning float-right">Create Group</a>
+{% endif %}
 <h1> Gruop {{course.name}} : {{project.name}}</h1>
 </br>
+
 <form class="form-inline" method="GET" action="{% url 'view_group' course_id=course.id project_id=project.id%}">
+
         <div class="form-group">
             <label for="search">ค้นหา:</label>
             <input type="text" class="form-control ml-3" id="search" 
@@ -31,12 +35,12 @@
     {% for group in groups %}
     <tr>
       <th scope="row">{{forloop.counter}}</th>
-      <td>{{group.group.name}}</td>
-      <td>{{group.group.project_topic}}</td>
+      <td>{{group.name}}</td>
+      <td>{{group.project_topic}}</td>
       <td>
       {% if group.num_member >=  project.mex_member%}
         <div class="text-danger"><b>เต็ม</b></div>
-        {% elif  group.num_member >  project.min_member %}
+        {% elif  group.num_member >=  project.min_member %}
             <div class="text-success"><b>{{group.num_member}} / {{project.mex_member}}</b></div>
         {% else %}
             <div>{{group.num_member}} / {{project.mex_member}}</div>
@@ -44,7 +48,7 @@
       {% endif %}
       
       </td>
-      <td><a href="{% url 'view_member' course_id=course.id project_id=project.id group_id=group.group.id %}" class="btn btn-outline-warning" role="button">View</a></td>
+      <td><a href="{% url 'view_member' course_id=course.id project_id=project.id group_id=group.id %}" class="btn btn-outline-warning" role="button">View</a></td>
     </tr>
     {% endfor %}
   </tbody>

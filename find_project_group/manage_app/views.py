@@ -185,10 +185,11 @@ def deleteProject(request, course_id, project_id):
 
 
 
-@login_required   
+@login_required
+@permission_required('manage_app.view_group')
 def viewGroup(request, course_id, project_id):
     search = request.GET.get('search', '')
-    groups = Student_Create.objects.filter(group_id__project_id__id = project_id).filter(group_id__name__icontains = search).annotate(num_member=Count('student'))
+    groups = Group.objects.filter(project_id__id = project_id).filter(name__icontains = search).annotate(num_member=Count('student_join__student'))
     project = Project.objects.get(pk = project_id)
     course = Course.objects.get(pk = course_id)
 
@@ -196,41 +197,75 @@ def viewGroup(request, course_id, project_id):
                                                                 'project' : project,
                                                                 'course' : course,
                                                                 'search': search})
-@login_required   
+@login_required
+@permission_required('manage_app.add_group')
 def addGroup(request, course_id, project_id):
-    project = Project.objects.get(pk = project_id)
-    course = Course.objects.get(pk = course_id)
-    if request.method == 'POST':
+    error=""
+    group = Group.objects.none()
+    try:
+        project = Project.objects.get(pk = project_id)
+        course = Course.objects.get(pk = course_id)
+        Student_Join.objects.get(
+            group__project_id=project_id,
+            student=Student.objects.get(user=request.user),
+        )
+        error = "You're already have group in this project"
+    except Student.DoesNotExist:
+        return redirect('view_group', course_id, project_id)
+    except Project.DoesNotExist:
+        return redirect('view_group', course_id, project_id)
+    except Course.DoesNotExist:
+        return redirect('view_group', course_id, project_id)
+    except Student_Join.DoesNotExist:
+        if request.method == 'POST':
         
-        group = Group.objects.create(    
-            name=request.POST.get('name'),
-            project_topic=request.POST.get('desc'),
-            project_id = project,
-        )
-        join = Student_Join.objects.create(    
-            group=group,
-            student=Student.objects.get(user=request.user),
-        )
-        create = Student_Create.objects.create(    
-            group=group,
-            student=Student.objects.get(user=request.user),
-        )
-        return redirect('view_group', course_id=course_id, project_id= project_id)
-    else:
-        group = Group.objects.none()
-
-    
+            group = Group.objects.create(    
+                name=request.POST.get('name'),
+                project_topic=request.POST.get('desc'),
+                project_id = project,
+            )
+            group.save()
+            join = Student_Join.objects.create(    
+                group=group,
+                student=Student.objects.get(user=request.user),
+            )
+            join.save()
+            create = Student_Create.objects.create(    
+                group=group,
+                student=Student.objects.get(user=request.user),
+            )
+            create.save()
+            return redirect('view_group', course_id=course_id, project_id= project_id)
 
     context = {
        'group':group,
        'project' : project,
         'course' : course,
+        'error': error,
     }
-
     return render(request, 'manage_app/add_group.html', context=context)                                                    
 
 
+@login_required 
+@permission_required('manage_app.delete_group')
+def deleteGroup(request, course_id, project_id, group_id):
+    
+    try:
+        creater = Student_Create.objects.get(group_id = group_id)
+        if request.user.id == creater.student.user.id:
+            group = Group.objects.get(pk = group_id )  
+            group.delete()
+        else:
+            return redirect('view_group', course_id, project_id)
+    except Group.DoesNotExist:
+        return redirect('view_group', course_id, project_id)
+    except Student_Create.DoesNotExist:
+        return redirect('view_group', course_id, project_id)
+    
+    return redirect('view_group', course_id, project_id)
+
 @login_required   
+@permission_required('manage_app.view_student_join')
 def viewMember(request, course_id, project_id, group_id):
     
     try:
@@ -301,7 +336,8 @@ def loadMember(request, group_id):
         return JsonResponse(serializer.errors, status=400, safe = False)
 
 
-@login_required   
+@login_required
+@permission_required('manage_app.delete_student_join') 
 def deleteMember(request, course_id, project_id, group_id, user_id):
     
     try:

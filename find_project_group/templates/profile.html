@@ -120,7 +120,7 @@
     }
 </style>
 <div class="container emp-profile">
-    <form method="GET" action="{% url 'find_project_user_profile' user_id=user.id %}">
+    <form method="GET" action="{% url 'find_project_user_profile' user_id=user.id student_id=user.student.id%}">
         <div class="row">
             <div class="col-md-4">
                 <div class="profile-img">
@@ -207,7 +207,7 @@
                                 <label>Project Experience</label>
                             </div>
                             <div class="col-md-8">  {% for item in project_ex %}
-                               Name : {{item.name}} </br> Project topic :{{item.Project_topic}}</br> Describtion : {{item.desc}}</br></br>
+                               Name : {{item.experience.name}} </br> Project topic :{{item.experience.Project_topic}}</br> Describtion : {{item.experience.desc}}</br></br>
 {% endfor %}
                             </div>
                             
@@ -220,7 +220,7 @@
     </form>
     <div class="col-md-2">
 
-        <form action="{% url 'find_project_user_profile_view' user_id=user.id %}">
+        <form action="{% url 'find_project_user_update' user_id=user.id %}">
 
             <button type="submit" class="btn btn-warning ml-3">Edit</button>
         </form>

@@ -19,25 +19,25 @@ from .forms import *
 from .models import *
 from .serializers import *
 
-
+@login_required
 def selectCouse(request):
     coursall = Course.objects.all()
     return render(request, 'manage_app/course.html',context={
         'coursall': coursall,}
     )
 
-
+@login_required
 def viewpro_ex(request):
     
 
     return render(request, 'manage_app/add_project_ex.html')
 
-
+@login_required
 def viewaddCourse(request):
     course = Course.objects.all()
 
     return render(request, 'manage_app/add_course.html',context={'course':course})
-
+@login_required
 def addpro_ex(request, student_id):
     
     
@@ -46,20 +46,26 @@ def addpro_ex(request, student_id):
 
     if request.method == 'POST':
         experience = Project_experience.objects.create(
-           
+            
             name=request.POST.get('name'),
             Project_topic=request.POST.get('Project_topic'),
             desc=request.POST.get('desc'),
             
         )
-        experience.save()
+        
+        
         stu_proex =Student_experience.objects.create(
             experience=experience,
             student=student,
         ) 
+        
         stu_proex.save()
+        experience.save()
+       
         msg_p = 'Successfully create new  project experience'
-    
+        print (experience.student)
+        print(experience)
+        print(stu_proex.student)
   
     else:  
         experience = Project_experience.objects.none() 

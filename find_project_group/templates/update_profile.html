@@ -121,26 +121,21 @@
 </style>
 <div class="container emp-profile">
     {% if user.id %}
-   
+
     <form method="POST" action="{% url 'find_project_user_update' user_id=user.id %}" enctype="multipart/form-data">
 
         {% else %}
         <!-- Submit to student_add view -->
-        <form method="POST" action="{% url 'find_project_user_profile' %}" >
+        <form method="POST" action="{% url 'find_project_user_profile' %}">
             {% endif %} {% csrf_token %}
             <div class="row">
                 <div class="col-md-4">
                     <div class="profile-img">
-    {% if user.student.profile_pic %}
-    <img src="{{request.user.student.profile_pic.url}}" alt="" />
-{% else %} 
-    <img src="/images/profile-user.png" alt="" />
-{% endif %}
-                       
-                        <div class="">
-                   
-                           {{form.as_p}}
-                        </div>
+                        {% if user.student.profile_pic %}
+                        <img src="{{request.user.student.profile_pic.url}}" alt="" /> {% else %}
+                        <img src="/images/profile-user.png" alt="" /> {% endif %}
+
+
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -158,7 +153,7 @@
                             <li class="nav-item">
                                 <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">About</a>
                             </li>
-                          
+
                         </ul>
                     </div>
                 </div>
@@ -170,74 +165,54 @@
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                         <div class="row">
                             <div class="col-md-6">
-                                <label>User Id</label>
+
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6"> <label style="color:#0062cc ;">User Id</label>
                                 <input type="text" class="form-control" name="username" id="username" value="{{user.username}}" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label>First Name</label>
+
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6"> <label style="color:#0062cc ;">First Name</label>
                                 <p> <input type="text" class="form-control" name="first_name" id="first_name" value="{{user.first_name}}" required></p>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label>Last Name</label>
+
+
                             </div>
                             <div class="col-md-6">
+                                <label style="color:#0062cc ;">Last Name:</label>
                                 <p> <input type="text" class="form-control" name="last_name" id="last_name" value="{{user.last_name}}" required></p>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
-                                <label>Year</label>
                             </div>
                             <div class="col-md-6">
-                                <p> <input type="number" class="form-control" name="year" id="year" value="{{user.student.year}}" required>
-                                </p>
+
+                                {{form.as_p}}
+
+
                             </div>
+
+
+
+
                         </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Major</label>
-                            </div>
-                            <div class="col-md-6">
-                                <p><input type="text" class="form-control" name="major" id="major" value="{{user.student.major}}" required>
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label>Contect</label>
-                            </div>
-                            <div class="col-md-6">
-                                <p>
-   
-                
-                                    <textarea row ="3" class="form-control" name="contect" id="contect" value="{{user.student.contect}}" required></textarea>
-                                </p>
-                            </div>
-                      
-
-
-
-               
-                   
+                    </div> <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
+                    <button type="submit" class="btn btn-info ml-3">Update</button>
+                    <a href="{% url 'find_project_add_pro_ex' student_id=user.student.id  %}" class="btn btn-warning float-right">Add Project Experiance</a>
                 </div>
-            </div> <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
-            <button type="submit" class="btn btn-info ml-3">Update</button>
-           <a href="{% url 'find_project_add_pro_ex' student_id=user.student.id  %}" class="btn btn-warning float-right">Add Project Experiance</a>
-</div>
 
-</form>
- 
-           
-</div>
+
+
+        </form>
+
+        </div>
 </div>
 
 

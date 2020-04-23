@@ -17,8 +17,10 @@ from django.shortcuts import redirect, render
 from django.urls import is_valid_path
 from django.urls.base import is_valid_path
 
-from manage_app.forms import StudentForm
-from manage_app.models import Project_experience, Student
+
+from manage_app.models import Project_experience, Student,Student_experience
+from manage_app.forms import StudentForm, UserForm
+
 
 # Create your views here.
 
@@ -90,6 +92,8 @@ def sign_in(request):
             major=request.POST.get('major'),
             contect=request.POST.get('contect')
         )
+        group = Group.objects.get(name='Student')
+        user.groups.add(group)
         user.save()
         msge = 'Successfully create new student - username: %s' % (user.username)
     else:
@@ -131,14 +135,16 @@ def change_password(request):
 
 
 
-
 @login_required
+@permission_required('auth.view_user')
 def update_profile(request,user_id):
     """
         Update ข้อมูลนักเรียนที่มี id = user_id
     """
     studentt = request.user.student
+    
     form = StudentForm(instance=studentt)
+   
     try:
         user = User.objects.get(pk=user_id)
         msge = ''
@@ -147,28 +153,21 @@ def update_profile(request,user_id):
 
     if request.method == 'POST':
         form = StudentForm(request.POST, request.FILES,instance=studentt)
+       
+        print (form)
         if form.is_valid():
             form.save()
+           
         user.username=request.POST.get('username')
         user.first_name=request.POST.get('first_name')
         user.last_name=request.POST.get('last_name')
-        try:
-            user.student.year=request.POST.get('year')
-            user.student.major=request.POST.get('major')
-            user.student.contect=request.POST.get('contect')
-        except Student.DoesNotExist:
-            student = Student.objects.create(
-            user=user,
-            year=request.POST.get('year'),
-            major=request.POST.get('major'),
-            contect=request.POST.get('contect'),
-        )
+ 
         user.save()
      
         msge = 'Successfully update student - username: %s' % (user.username)
     
     context = {
-        'student': user,
+        'user': user,
         'msge': msge,
         'form':form,
      
@@ -178,27 +177,16 @@ def update_profile(request,user_id):
 
 
 
-def view_update_profile(request,user_id):
-    user = User.objects.get(pk=user_id)
-    studentt = request.user.student
-    form = StudentForm(instance=studentt)
-    student = Student.objects.all()
-    project_ex = Project_experience.objects.all()
-    context = {
-        'student': student,
-        'user': user,
-        'project_ex':project_ex,
-        'form':form,
-    }
-    return render(request, 'update_profile.html',context=context)
+
 
 @login_required   
 
-def profile_user(request,user_id):
+@permission_required('auth.view_user')
+def profile_user(request,user_id,student_id):
     user = User.objects.get(pk=user_id)
     
-    student = Student.objects.all()
-    project_ex = Project_experience.objects.all()
+    student = Student.objects.get(pk=student_id)
+    project_ex = Student_experience.objects.filter(student=student)
     context = {
         'student': student,
         'user': user,

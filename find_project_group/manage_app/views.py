@@ -267,7 +267,7 @@ def deleteGroup(request, course_id, project_id, group_id):
 @login_required   
 @permission_required('manage_app.view_student_join')
 def viewMember(request, course_id, project_id, group_id):
-    
+
     try:
         course = Course.objects.get(pk = course_id)
         group = Group.objects.get(pk = group_id)
@@ -282,37 +282,11 @@ def viewMember(request, course_id, project_id, group_id):
     except Project.DoesNotExist:
         return redirect('view_group', course_id, project_id)
 
-    members = Student_Join.objects.filter(group_id = group_id).annotate(num_member=Count('student'))
-    error = ''
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        try:
-            stusent = Student.objects.get(user_id__username = username)
-            try:
-                already = Student_Join.objects.get(
-                    student_id = stusent.id,
-                    group_id__project_id = project_id
-                )
-                error = 'This student is already has group in this project'
-            except Student_Join.DoesNotExist:
-                if members.count() >= project.mex_member:
-                    error = 'This group is full'
-                else:
-                    join = Student_Join.objects.create(
-                        student_id = stusent.id,
-                        group_id = group_id,
-                    )  
-                    join.save()
-        except Student.DoesNotExist:
-            error = 'Not found this username'
-    
     return render(request, 'manage_app/member.html',context={'group':group, 
                                                                 'project' : project,
-                                                                'members' : members,
                                                                 'course' : course,
                                                                 'creater': creater,
-                                                                'error' : error})
+                                                                })
 
 
 @api_view(['GET',"POST"])
@@ -323,23 +297,48 @@ def loadMember(request, group_id):
         return JsonResponse(serializer.data, status=200, safe = False)
 
     elif request.method == 'POST':
-        
+        error = ''
         inp = request.data
         data = {}
-        student = Student.objects.get(user__username=inp['user'])
-        data['group'] = inp['group']
-        data['student'] = student.id
-        serializer = Student_JoinSerializer(data = data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201, safe = False)
-        return JsonResponse(serializer.errors, status=400, safe = False)
+        members = Student_Join.objects.filter(group_id = group_id)
+        try:
+            student = Student.objects.get(user_id__username = inp['user'])
+            project = Project.objects.get(pk = inp['project'])
+            try:
+                already = Student_Join.objects.get(
+                    student_id = student.id,
+                    group_id__project_id = inp['project']
+                )
+                error = 'This student is already has group in this project'
+                return JsonResponse({'status':'false','error':error}, status=500)
+            except Student_Join.DoesNotExist:
+                if members.count() >= project.mex_member:
+                    error = 'This group is full'
+                    return JsonResponse({'status':'false','error':error}, status=500)
+                else:
+                    data['group'] = inp['group']
+                    data['student'] = student.id
+                    serializer = Student_JoinSerializer(data = data)
+                    if serializer.is_valid():
+                        serializer.save()
+                    return JsonResponse(serializer.data, status=201, safe = False)
+                return JsonResponse(serializer.errors, status=400, safe = False)
+        except Student.DoesNotExist:
+            error = 'Not found this username'
+            return JsonResponse({'status':'false','error':error}, status=500)
+        except Project.DoesNotExist:
+            error = 'Not found this project'
+            return JsonResponse({'status':'false','error':error}, status=500)
 
+        
+        
+            
+        
 
 @login_required
 @permission_required('manage_app.delete_student_join') 
-def deleteMember(request, course_id, project_id, group_id, user_id):
-    
+def deleteMember(request, group_id, user_id):
+    message = ''
     try:
         creater = Student_Create.objects.get(group_id = group_id)
         if request.user.id == creater.student.user.id:
@@ -349,10 +348,12 @@ def deleteMember(request, course_id, project_id, group_id, user_id):
             )  
             join.delete()
         else:
-            return redirect('view_member', course_id, project_id, group_id)
+            message = "You don't have permission"
+            return JsonResponse({'status':'false','error':message}, status=500)
     except Student_Join.DoesNotExist:
-        return redirect('view_member', course_id, project_id, group_id)
+        message = "Student not found"
+        return JsonResponse({'status':'false','error':message}, status=500)
     except Student_Create.DoesNotExist:
-        return redirect('view_member', course_id, project_id, group_id)
-    
-    return redirect('view_member', course_id, project_id, group_id)
+        message = "Group not found"
+        return JsonResponse({'status':'false','error':message}, status=500)
+    return HttpResponse(status=200)

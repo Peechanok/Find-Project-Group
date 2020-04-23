@@ -13,11 +13,12 @@ class StudentSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Student
-        fields = ['major','contect', 'year', 'user']
+        fields = ['id','major','contect', 'year', 'user']
+        read_only_fields = ['id',]
 
 class Student_JoinSerializer(serializers.ModelSerializer):
     student_detail = StudentSerializer(source='student', read_only=True)
     class Meta:
         model = Student_Join
-        fields = ['group','student','student_detail']
-        read_only_fields = ['student_detail']
+        fields = ['id','group','student','student_detail']
+        read_only_fields = ['id', 'student_detail']

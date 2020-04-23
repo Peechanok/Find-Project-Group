@@ -2,7 +2,7 @@
 
 {% block content %} 
 {% load static %}
-
+<body onload = 'initialize ()'>
 
 <div class="container emp-profile" >
 {% if user.id == creater.student.user.id %}
@@ -24,25 +24,11 @@
     </tr>
   </thead>
   <tbody id ='t-body'>
-    {% for member in members %}
-    <tr>
-      <td>{{forloop.counter}}</td>
-      <td>{{member.student.user.first_name}}</td>
-      <td>{{member.student.user.last_name}}</td>
-      <td>{{member.student.major}}</td>
-      <td >
-      <a href="{% url 'find_project_user_profile' user_id=member.student.user_id %}" class="btn btn-outline-warning" role="button"><i class="far fa-eye"></i></a>
-      {% if user.id == creater.student.user.id and  member.student.user.id != creater.student.user.id and perms.manage_app.delete_student_join %}
-      <a href="{% url 'delete_member' course_id=course.id  project_id=project.id group_id=group.id user_id=member.student.id %}" class="btn btn-outline-danger" role="button"><i class="far fa-trash-alt"></i></a>
-      {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
+    
   </tbody>
 </table>
-{% if error %}
-  <p class = "text-danger">{{error}}</p>
-{% endif %}
+  <b><p id = 'delete_error'class = "text-danger">{{error}}</p><b>
+
 {% if user.id == creater.student.user.id %}
 <button id ="open-button" class="btn btn-success" >Join Member</button>
 
@@ -50,19 +36,21 @@
 
  
     
-    <form method="POST" action="{% url 'view_member' course_id=course.id project_id=project.id group_id=group.id %}" class='form-container'>
+    <div class='form-container'>
     {% csrf_token %}
     <h3>Add Someone</h3>
 
     <label for="email"><b>username :</b></label>
     <input id = 'user' type="text" class= 'form-control' placeholder="Enter username" name="username" required>
     </br>
-    <button  type="submit" class="btn btn-success">Add</button>
+    <b><p id = 'add_error'class = "text-danger"></p><b>
+    <button onclick='addMember ()' type="submit" class="btn btn-success">Add</button>
     </div>
 </div>
 {% endif %}
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+
 let button = document.getElementById("open-button");
 button.addEventListener("click", openForm);
 
@@ -84,25 +72,35 @@ function closeForm() {
 </script>
 
 <script>
+  let course_id = '{{course.id}}'
+  let project_id = '{{project.id}}'
+  let group_id = '{{group.id}}'
+  let creater = '{{creater.student.id}}'
+  let creater_user = '{{creater.student.user.id}}'
+  let current_user = '{{user.id}}'
+
+  console.log(creater_user)
+  console.log(current_user)
+ 
         // const axios = require('axios');
   var items = []
+
   axios.defaults.xsrfCookieName = 'csrftoken'
   axios.defaults.xsrfHeaderName = 'X-CSRFTOKEN'
+  
   let num = 1
   function initialize () {
-    axios.get("{% url 'loadMember' group_id=group.id %}")
+    axios.get("/view_group/load/"+ group_id +"/")
     .then(function (response) {
       // handle success
-      console.log('hello')
-      
       items = response.data
       items.forEach((item) => {
         let name = item.student_detail.user.first_name
         let surname = item.student_detail.user.last_name
         let major = item.student_detail.major
-        let id = item.student_detail.user.id
+        let student = item.student_detail
 
-        let tr = createMember(id, num, name, surname, major)
+        let tr = createMember(student, num, name, surname, major)
         let tbody = document.querySelector('#t-body')
         tbody.appendChild(tr)
         num++
@@ -120,12 +118,13 @@ function closeForm() {
   function addMember () {
     let textInput = document.querySelector('#user')
     let text = textInput.value
-    let group = '{{group.id}}'
-
+    let textadd = document.querySelector('#add_error')
+    let textbox = document.querySelector('#delete_error')
             // Send AJAX resuest to create in the DB
-    axios.post("{% url 'loadMember' group_id=group.id %}", {
+    axios.post("/view_group/load/"+ group_id +"/", {
       user: text,
-      group: group,
+      group: group_id,
+      project: project_id,
     })
     .then(function (response) {
       // handle success
@@ -133,31 +132,58 @@ function closeForm() {
       
       item = response.data
 
+        
         let name = item.student_detail.user.first_name
         let surname = item.student_detail.user.last_name
         let major = item.student_detail.major
-        let id = item.student_detail.user.id
+        let student = item.student_detail
 
-        let tr = createMember(id, num, name, surname, major)
+        let tr = createMember(student, num, name, surname, major)
         let tbody = document.querySelector('#t-body')
         tbody.appendChild(tr)
+        textInput.value= ''
+        textadd.innerText = ''
+        textbox.innerText = ''
         num++
       console.log(response);
     })
     .catch(function (error) {
       console.log(error);
-      
+      textadd.innerText = error.response.data.error
+    })
+    .then(function () {
+      // always executed
+    });
+  }
+
+  function deleteMember(event) {
+    let button = event.currentTarget
+    let userid = button.getAttribute('student_id')
+    let textbox = document.querySelector('#delete_error')
+    let textadd = document.querySelector('#add_error')
+
+    axios.post("/view_group/delete/"+ group_id +"/"+ userid +"/")
+    .then(function (response) {
+      let tbody = document.querySelector('#t-body')
+      tbody.innerText = ''
+      textbox.innerText = ''
+      textadd.innerText = ''
+      num = 1
+      initialize ()
+    })
+    .catch(function (error) {
+      console.log(error.response.data.error);
+      textbox.innerText = error.response.data.error
     })
     .then(function () {
       // always executed
     });
   }
         
-  function createMember(id,num, name, surname, major){
-      let creater = '{{creater.student.user.id}}'
+  function createMember(student,num, name, surname, major){
       let tr = document.createElement('tr')
       let td = document.createElement('td')
-      if (creater == id){
+      if (creater_user == student.user.id){
         td.innerHTML = num+ " <b class='text-success'>(หัวหน้ากลุ่ม)</b>"
       }
       else{
@@ -181,21 +207,23 @@ function closeForm() {
       td = document.createElement('td')
       let a = document.createElement('a')
       a.innerHTML = '<i class="far fa-eye"></i>'
-      a.className ='btn btn-outline-warning'
-      let link = "{% url 'find_project_user_profile' 999 %}".replace('999',id)
-      a.href = link
+      a.className ='btn btn-outline-warning mr-2'
+      a.href = '/profile/edit/'+ student.user.id +'/'
+      td.appendChild(a)
+      if(creater_user == current_user && current_user != student.user.id){
+        let button = document.createElement('button')
+        button.className ='btn btn-outline-danger'
+        button.innerHTML = '<i class="far fa-trash-alt">'
+        button.setAttribute("student_id", student.id)
+        button.type = 'button'
+        button.addEventListener("click", deleteMember)
+        td.appendChild(button)
+      }
       
 
-      let button = document.createElement('button')
-      button.className ='btn btn-danger'
-      button.innerHTML = '<i class="far fa-trash-alt">'
-      button.type = 'button'
-      button.addEventListener("click", initialize)
-      td.appendChild(a)
-      td.appendChild(button)
+      
       tr.appendChild(td)
       
-  
       return tr
       
   }
@@ -204,5 +232,5 @@ function closeForm() {
 
 </script>
 
-
+</body>
 {% endblock %}

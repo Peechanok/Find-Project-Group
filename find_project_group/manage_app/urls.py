@@ -19,7 +19,7 @@ path('view_group/<int:course_id>/<int:project_id>/add',views.addGroup, name='add
 path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/delete',views.deleteGroup, name='delete_group') ,
 path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/',views.viewMember, name='view_member') ,
 path('view_group/load/<int:group_id>/',views.loadMember, name='loadMember') ,
-path('view_group/<int:course_id>/<int:project_id>/<int:group_id>/<int:user_id>/delete',views.deleteMember, name='delete_member') ,
-
+path('view_group/delete/<int:group_id>/<int:user_id>/',views.deleteMember, name='deleteMember') ,
+ 
 
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

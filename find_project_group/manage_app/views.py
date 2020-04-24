@@ -31,6 +31,30 @@ def viewpro_ex(request):
     
 
     return render(request, 'manage_app/add_project_ex.html')
+@login_required
+def removepro_ex(request, student_id,pro_id):
+    student = Student.objects.get(id=student_id)
+    project_ex = Project_experience.objects.get(pk=pro_id)
+    
+
+    project_ex.delete()
+    return redirect(to='view_pro_ex', student_id=student.id)
+
+@login_required
+def view_pro_ex(request, student_id):
+    student = Student.objects.get(pk=student_id)
+    
+    project_ex = Student_experience.objects.filter(student=student)
+    
+    
+    context = {
+        'student': student,
+        
+        'project_ex':project_ex
+    }
+    return render(request, 'manage_app/view_pro_ex_pro.html',context=context)
+
+
 
 @login_required
 def viewaddCourse(request):
@@ -125,12 +149,13 @@ def addCourse(request):
 
     return render(request, 'manage_app/add_course.html', context=context)
 @login_required   
-@permission_required('manage_app.delete_course')
+
 def viewCourse(request):
     course = Course.objects.all()
 
     return render(request, 'manage_app/view_course.html',context={'course':course})
-
+@login_required
+@permission_required('manage_app.delete_course')
 def deleteCourse(request,course_id):
     """
         ลบข้อมูล course โดยลบข้อมูลที่มี id = course_id
@@ -140,7 +165,7 @@ def deleteCourse(request,course_id):
     return redirect(to='view_course')
 
 # ส่วนของหน้า Project
-
+@login_required
 def selectProject(request, course_id):
     course = Course.objects.get(pk=course_id)
     projectall = Course_Assign.objects.filter(course=course)
@@ -182,7 +207,7 @@ def addProject(request, course_id):
     }
 
     return render(request, 'manage_app/add_project.html', context=context)
-
+@login_required
 def deleteProject(request, course_id, project_id):
     course = Course.objects.get(pk=course_id)
     project = Project.objects.get(id=project_id)

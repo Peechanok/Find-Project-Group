@@ -205,7 +205,8 @@
                         </div>
                     </div> <button type="reset" class="btn btn-danger ml-3">Reset Form</button>
                     <button type="submit" class="btn btn-info ml-3">Update</button>
-                    <a href="{% url 'find_project_add_pro_ex' student_id=user.student.id  %}" class="btn btn-warning float-right">Add Project Experiance</a>
+                    <a href="{% url 'find_project_add_pro_ex' student_id=user.student.id  %}" class="btn btn-warning float-right">Add Project Experiance</a> &nbsp;
+                   &nbsp;&nbsp; <a href="{% url 'view_pro_ex' student_id=user.student.id  %}" class="btn btn-success float-right">Manage Project Experiance</a>
                 </div>
 
 

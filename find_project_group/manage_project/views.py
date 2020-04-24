@@ -116,6 +116,7 @@ def sign_in(request):
 
 
 @login_required
+@permission_required('auth.view_user')
 def change_password(request):
     context = {}
     if request.method == 'POST':
@@ -188,7 +189,7 @@ def update_profile(request,user_id):
 
 @login_required   
 
-
+@permission_required('auth.view_user')
 def profile_user(request,user_id,student_id):
     user = User.objects.get(pk=request.user.id)
     

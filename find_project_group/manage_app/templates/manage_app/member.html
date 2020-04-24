@@ -208,7 +208,7 @@ function closeForm() {
       let a = document.createElement('a')
       a.innerHTML = '<i class="far fa-eye"></i>'
       a.className ='btn btn-outline-warning mr-2'
-      a.href = '/profile/edit/'+ student.user.id +'/'
+      a.href = '/profile/friend/'+student.id+'/'+ student.user.id +'/'
       td.appendChild(a)
       if(creater_user == current_user && current_user != student.user.id){
         let button = document.createElement('button')

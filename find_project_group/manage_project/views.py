@@ -181,15 +181,29 @@ def update_profile(request,user_id):
 
 @login_required   
 
-@permission_required('auth.view_user')
+
 def profile_user(request,user_id,student_id):
-    user = User.objects.get(pk=user_id)
+    user = User.objects.get(pk=request.user.id)
     
     student = Student.objects.get(pk=student_id)
     project_ex = Student_experience.objects.filter(student=student)
+    
+    
     context = {
         'student': student,
         'user': user,
         'project_ex':project_ex
     }
     return render(request, 'profile.html',context=context)
+@login_required   
+def profile_user_view_friend(request,studentf_id,userf_id):
+    user = User.objects.get(pk=userf_id)
+    
+    student = Student.objects.get(pk=studentf_id)
+    project_ex = Student_experience.objects.filter(student=student)
+    context = {
+        'student': student,
+        'user': user,
+        'project_ex':project_ex
+    }
+    return render(request, 'viewfriend.html',context=context)

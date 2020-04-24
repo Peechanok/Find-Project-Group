@@ -11,7 +11,7 @@ urlpatterns = [
      
      path('profile/edit/view/update/<int:user_id>/',views.update_profile, name='find_project_user_update'),
      path('profile/edit/<int:user_id>/<int:student_id>/',views.profile_user, name='find_project_user_profile'),
-      path('profile/friend/<int:studentf_id>/<int:userf_id>/',views.profile_user_view_friend, name='find_project_user_profile_friend'),
+     path('profile/friend/<int:studentf_id>/<int:userf_id>/',views.profile_user_view_friend, name='find_project_user_profile_friend'),
      
      path('profile/chang_password',views.change_password, name='find_project_user_profile_password_c'),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

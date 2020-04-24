@@ -117,12 +117,16 @@
     }
 </style>
 <div class="container emp-profile">
+<h1> Course </h1>
     <form class="form-inline" method="GET" action="{% url 'find_project_couse' %}">
+    
         <div class="row">
            
-            <div class="col-md">
-                  <table class="table">
+            
+            
+            <table class="table">
                 <tbody>
+                <tr>
                     {% for item in coursall %}
                     <td> Name: {{ item.name }}</br> Describtion : {{ item.desc }}</br></br></br>
                        
@@ -130,12 +134,18 @@
                             <a type="submit" class="btn btn-info ml-3" href="{% url 'find_project_project' course_id=item.id %}">Open</a>
                         
                     </td>
+                    {% if forloop.counter|divisibleby:3  %}
+                    </tr>
+                    <tr>
+                    {% endif %}
                     </br> {% endfor %}
 
                 </tbody>
             </table>
-
+        
     </form></br></br>
+            <div class="col-md">
+            
     <div class="row">
      <div class="col-md-2"> {%if perms.manage_app.add_course%}
         <form action="{% url 'add_course' %}">
@@ -156,37 +166,12 @@
         </div>
         <div class="row">
             <div class="col-md-4">
-
-
             </div>
-            <div class="col-md-8">
- 
-            </div>
-
-
+            <div class="col-md-8"></div>
         </div>
     </form>
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

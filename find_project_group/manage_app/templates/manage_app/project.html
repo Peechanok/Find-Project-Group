@@ -124,15 +124,22 @@
             <div class="col-md">
                   <table class="table">
                 <tbody>
+                    <tr>
                     {% for item in projectall %}
                     <td> Name: {{ item.project.name }}</br> Describtion : {{ item.project.desc }} </br>
                          max of group: {{ item.project.mex_member }} </br> min of group: {{ item.project.min_member }}</br></br></br>
                         <form>
 
                             <a href="{% url 'view_group' course_id=course.id project_id=item.project.id %}" type="submit" class="btn btn-info ml-3">Open</a>
-                            <a type="submit" class="btn btn-info ml-3" href="{% url 'delete_project' project_id=item.project.id course_id=course.id %}">Delete</a>
+                            {%if perms.manage_app.delete_course%}
+                            <a type="submit" class="btn btn-danger ml-3" href="{% url 'delete_project' project_id=item.project.id course_id=course.id %}">Delete</a>
+                            {% endif %}
                         </form>
                     </td>
+                    {% if forloop.counter|divisibleby:3  %}
+                    </tr>
+                    <tr>
+                    {% endif %}
                     </br> {% endfor %}
 
                 </tbody>

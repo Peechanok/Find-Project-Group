@@ -53,7 +53,14 @@
                                     {% csrf_token %}
                                     <input id="username" class="form-control" type="username" placeholder="Username" name="username">
                                     <input id="password" class="form-control" type="password" placeholder="Password" name="password">
+                                    {% if msge %}
+                                    <p class='text-success'>{{ msge }}</p>
+                                    {% endif %}
+                                    {% if error %}
+                                    <p class='text-danger'>{{ error }}</p>
+                                    {% endif %}
                                     <input class="btn btn-default btn-login" type="submit" value="Login"  >
+                                    <input type='hidden' name='next_url'value='{{ next_url }}'>
                                     </form>
                                 </div>
                              </div>
@@ -62,15 +69,17 @@
                             <div class="content registerBox" style="display:none;">
                              <div class="form">
                                 <form  method="POST" action="{% url 'find_project_signin' %} " enctype="multipart/form-data" html="{:multipart=>true}" data-remote="true" action="" accept-charset="UTF-8">{% csrf_token %}
-                                <input id="username" class="form-control" type="text" placeholder="username" name="username" required>
-                                <input id="password" class="form-control" type="password" placeholder="Password" name="password"required>
+                                <input id="username" class="form-control" type="text" placeholder="username" name="username" value ="{{username}}" required>
+                                <input id="password" class="form-control" type="password" placeholder="Password" name="password" required>
                       
-                                <input id="first_name" class="form-control" type="text" placeholder="first_name" name="first_name" required>
-                                <input id="last_name" class="form-control" type="text" placeholder="last_name" name="last_name" required>
-                                <input id="year" class="form-control" type="number" placeholder="year" name="year" required>
-                                <input id="major" class="form-control" type="text" placeholder="major" name="major" required>
-                                <textarea id="contect"  row ="3" class="form-control"  placeholder="contect" name="contect" required></textarea>
-                                
+                                <input id="first_name" class="form-control" type="text" placeholder="first_name" name="first_name" value ="{{first_name}}" required>
+                                <input id="last_name" class="form-control" type="text" placeholder="last_name" name="last_name" value ="{{last_name}}" required>
+                                <input id="year" class="form-control" type="number" placeholder="year" name="year" value ="{{year}}" required>
+                                <input id="major" class="form-control" type="text" placeholder="major" name="major" value ="{{major}}" required>
+                                <textarea id="contect"  row ="3" class="form-control"  placeholder="contect" name="contect" value ="{{contect}}" required></textarea>
+                                {% if error2 %}
+                                    <p class='text-danger'>{{ error2 }}</p>
+                                {% endif %}
                                 <input class="btn btn-default btn-register" type="submit" value="Create account" name="commit">
                                 </form>
                                 </div>

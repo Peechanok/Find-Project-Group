@@ -30,11 +30,10 @@ def home(request):
     return render(request, 'home.html',)
 
 
-
-
-
 def my_login(request):
     context = {}
+    if request.user.is_authenticated:
+        return redirect('find_project_home')
 
     if request.method == 'POST':
        
@@ -73,37 +72,45 @@ def sign_in(request):
     """
         เพิ่มข้อมูล user / student ใหม่เข้าสู่ฐานข้อมูล
     """
-    msg = ''
-    
+    msge = ''
+    context = {}
     if request.method == 'POST':
-        
-        user = User.objects.create_user(
-            request.POST.get('username'),
-            request.POST.get('email'),
-            request.POST.get('password'),
-            
-        )
-       
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        student = Student.objects.create(
-            user=user,
-            year=request.POST.get('year'),
-            major=request.POST.get('major'),
-            contect=request.POST.get('contect')
-        )
-        group = Group.objects.get(name='Student')
-        user.groups.add(group)
-        user.save()
-        msge = 'Successfully create new student - username: %s' % (user.username)
+        if User.objects.filter(username = request.POST.get('username')).exists():
+            context['username'] = request.POST.get('username')
+            context['password'] = request.POST.get('password')
+            context['first_name'] = request.POST.get('first_name')
+            context['last_name'] = request.POST.get('last_name')
+            context['year'] = request.POST.get('year')
+            context['contect'] = request.POST.get('contect')
+            context['major'] = request.POST.get('major')
+            context['error'] = 'Register Fail'
+            context['error2'] = 'This username is already exist'
+            user = User.objects.none()
+        else:
+            user = User.objects.create_user(
+                request.POST.get('username'),
+                request.POST.get('email'),
+                request.POST.get('password'),
+
+            )
+
+            user.first_name = request.POST.get('first_name')
+            user.last_name = request.POST.get('last_name')
+            student = Student.objects.create(
+                user=user,
+                year=request.POST.get('year'),
+                major=request.POST.get('major'),
+                contect=request.POST.get('contect')
+            )
+            group = Group.objects.get(name='Student')
+            user.groups.add(group)
+            user.save()
+            msge = 'Successfully create new student - username: %s' % (user.username)
     else:
         user = User.objects.none()
 
-    context = {
-        'student': user,
-        'msge': msge,
-        
-    }
+    context['student'] = user
+    context['msge'] = msge
 
     return render(request, 'Loginindex.html', context=context)
 

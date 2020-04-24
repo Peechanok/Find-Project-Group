@@ -132,3 +132,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
 
 
 MEDIA_URL = '/images/'
+
+LOGIN_URL = 'find_project_login'

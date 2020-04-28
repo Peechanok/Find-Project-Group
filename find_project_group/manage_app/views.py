@@ -26,12 +26,10 @@ def selectCouse(request):
         'coursall': coursall,}
     )
 
-@login_required
-def viewpro_ex(request):
-    
 
-    return render(request, 'manage_app/add_project_ex.html')
+
 @login_required
+@permission_required('auth.view_user')
 def removepro_ex(request, student_id,pro_id):
     student = Student.objects.get(id=student_id)
     project_ex = Project_experience.objects.get(pk=pro_id)
@@ -41,6 +39,7 @@ def removepro_ex(request, student_id,pro_id):
     return redirect(to='view_pro_ex', student_id=student.id)
 
 @login_required
+
 def view_pro_ex(request, student_id):
     student = Student.objects.get(pk=student_id)
     
@@ -62,6 +61,7 @@ def viewaddCourse(request):
 
     return render(request, 'manage_app/add_course.html',context={'course':course})
 @login_required
+@permission_required('auth.view_user')
 def addpro_ex(request, student_id):
     
     

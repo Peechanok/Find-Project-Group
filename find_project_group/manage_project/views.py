@@ -25,6 +25,7 @@ from manage_app.forms import StudentForm, UserForm
 # Create your views here.
 
 @login_required
+
 def home(request):
         
     return render(request, 'home.html',)
